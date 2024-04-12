@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <link rel="apple-touch-icon" sizes="76x76" href="img/apple-icon.png">
+  <link rel="icon" type="image/png" href="img/favicon.png">
+  <link href="datatable/datatables.min.css" rel="stylesheet"/>
+  <title>
+   <%- data.title_page %>
+  </title>
+  <!-- Fonts and icons -->
+  <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700,900|Roboto+Slab:400,700" />
+  <!-- Nucleo Icons -->
+  <link href="css/nucleo-icons.css" rel="stylesheet" />
+  <link href="css/nucleo-svg.css" rel="stylesheet" />
+  <!-- Font Awesome Icons -->
+<!--  <script src="https://kit.fontawesome.com/42d5adcbca.js" crossorigin="anonymous"></script> -->
+  <!-- Material Icons -->
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
+  <!-- CSS Files -->
+  <link id="pagestyle" href="css/material-dashboard.css?v=3.1.0" rel="stylesheet" />
+  <!-- Nepcha Analytics (nepcha.com) -->
+  <!-- Nepcha is a easy-to-use web analytics. No cookies and fully compliant with GDPR, CCPA and PECR. -->
+ </head>
+<body class="g-sidenav-show  bg-gray-200">
+  <%- include('../components/side_menu.ejs'); %>
+  <main class="main-content position-relative max-height-vh-100 h-100 border-radius-lg">
+    <%- include('../components/navbar.ejs', { data: data.title_page}); %>
+      <div class="container-fluid py-4">
+         <div class="p-4"> 
+            <div class="col-xl-6 col-sm-6 mb-xl-0 mb-4">
+           <form id="myform">
+            <div class="input-group input-group-dynamic mb-4">
+                <label class="form-label">Nome</label>
+                <input type="text" class="form-control" id="nome" aria-label="nome" required>
+            </div>
+            <div class="input-group input-group-dynamic mb-4">
+                <label class="form-label">Cognome</label>
+                <input type="text" class="form-control"  id="cognome" aria-label="Cognome"  required>
+            </div>
+            <div class="input-group input-group-static my-3">
+                <label>Data di Nascita</label>
+                <input type="date" class="form-control" id="data_nascita" aria-describedby="basic-addon1" required>
+            </div>
+            <div class="input-group input-group-dynamic mb-4">
+                <label class="form-label">Luogo nascita</label>
+                <input type="text" class="form-control" id="luogo_nascita" aria-describedby="basic-addon1" required>
+            </div>
+            <div class="input-group input-group-dynamic mb-4">
+                <label class="form-label">Comune di residenza</label>
+                <input type="text" class="form-control" id="comune_residenza" aria-describedby="basic-addon1" required>
+            </div>
+            <div class="input-group input-group-dynamic mb-4">
+                <label class="form-label">Indirizzo di residenza</label>
+                <input type="text" class="form-control" id="indirizzo_residenza" aria-describedby="basic-addon1" required>
+            </div>
+            <div class="input-group input-group-dynamic mb-4">
+                <label class="form-label">Telefono</label>
+                <input id="telefono" type="tel" class="form-control" aria-describedby="basic-addon1" required>
+            </div>
+            <div class="input-group input-group-dynamic mb-4">
+                <label class="form-label">Email</label>
+                <input type="text" class="form-control" id="email" aria-label="Email" aria-describedby="basic-addon1" required>
+            </div>
+            <div class="form-check form-switch">
+                <label class="form-check-label">Consenso dati</label>
+                <input class="form-check-input" id="consenso" type="checkbox" required>
+            </div>
+            <div class="form-check form-switch d-flex flex-row-reverse">
+                <button id="invia" type="button" class="btn btn-primary">Salva</button>
+            </div>
+           </form>
+         </div>     
+        </div>
+    </div>
+  </main>
+  <!--   Core JS Files   -->
+  <script src="js/core/popper.min.js"></script>
+  <script src="js/core/bootstrap.min.js"></script>
+  <script src="js/plugins/perfect-scrollbar.min.js"></script>
+  <script src="js/plugins/smooth-scrollbar.min.js"></script>
+  <script src="js/plugins/chartjs.min.js"></script>
+  <script src="js/jquery-3.7.0.min/jquery-3.7.0.min.js"></script>
+  <script>
+    $(document).ready(function() {
+      const areAllValuesNotEmpty = (obj) => {
+       console.log("check:")
+       console.log( Object.values(obj).every(value => value !== null && value !== undefined && value !== ''));
+       return Object.values(obj).every(value => value !== null && value !== undefined && value !== '');
+      }
+      $("#invia").click(function() {
+        let obj = {
+        nome : $('#nome').val(),
+        cognome : $('#cognome').val(),
+        luogo_nascita : $('#luogo_nascita').val(),
+        comune_residenza : $('#comune_residenza').val(),
+        indirizzo_residenza : $('#indirizzo_residenza').val(),
+        telefono : $('#telefono').val(),
+        email : $('#email').val(),
+        data_nascita :  new Date($('#data_nascita').val()),
+        consenso : $('#consenso').val() == "on" ? true : false,
+      }
+      if(areAllValuesNotEmpty(obj) && $('#consenso').is(":checked")){
+          $.ajax({
+          type:"post",
+          url: "/aggiungi_utente",
+          data: obj,
+          success: (result) => {
+              alert(`Salvataggio di \n${result.nome} ${result.cognome}\neffettuato`);
+              $(':input','#myform')
+              .not(':button, :submit, :reset, :hidden')
+              .val('')
+              .prop('checked', false)
+              .prop('selected', false)
+          },
+          error:(err)=>{
+              console.log(err);
+          }
+        });
+         } else {
+          alert(`Compila tutti i campi`);
+          if($('#consenso').is(":checked")){
+            alert(`Fare accettare il consenso`);
+          }
+        }
+      });
+    });
+  </script>
+  <script>
+    var win = navigator.platform.indexOf('Win') > -1;
+    if (win && document.querySelector('#sidenav-scrollbar')) {
+      var options = {
+        damping: '0.5'
+      }
+      Scrollbar.init(document.querySelector('#sidenav-scrollbar'), options);
+    }
+  </script>
+
+  <!-- Control Center for Material Dashboard: parallax effects, scripts for the example pages etc -->
+  <script src="js/material-dashboard.min.js?v=3.1.0"></script>
+</body>
+
+</html>

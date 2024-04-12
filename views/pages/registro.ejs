@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <link rel="apple-touch-icon" sizes="76x76" href="img/apple-icon.png">
+  <link rel="icon" type="image/png" href="img/favicon.png">
+  <title>
+   <%= data.title_page %>
+  </title>
+  <!-- Fonts and icons -->
+  <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700,900|Roboto+Slab:400,700" />
+  <!-- Nucleo Icons -->
+  <link href="css/nucleo-icons.css" rel="stylesheet" />
+  <link href="css/nucleo-svg.css" rel="stylesheet" />
+  <!-- Font Awesome Icons -->
+<!--  <script src="https://kit.fontawesome.com/42d5adcbca.js" crossorigin="anonymous"></script> -->
+  <!-- Material Icons -->
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
+  <!-- CSS Files -->
+  <link id="pagestyle" href="css/material-dashboard.css?v=3.1.0" rel="stylesheet" />
+  <!-- Nepcha Analytics (nepcha.com) -->
+  <link href="datatable/datatables.min.css" rel="stylesheet"/>
+  <meta charset="UTF-8">
+  </head>
+<body class="g-sidenav-show  bg-gray-200">
+  <%- include('../components/side_menu.ejs'); %>
+  <main class="main-content position-relative max-height-vh-100 h-100 border-radius-lg">
+    <%- include('../components/navbar.ejs', { data: data.title_page } ); %>
+    <div class="container-fluid py-4">
+      <div class="row mb-4">
+        <div class="col-lg-12 col-md-6 mb-md-0 mb-4">
+            <div class="card-body px-0 pb-2">
+              <div class="table-responsive">
+                <table id="tabella" class="table" style="width:100%">
+                  <thead>
+                      <tr>
+                          <th>Nome</th>
+                          <th>Cognome</th>
+                          <th>Luogo Nascita</th>
+                          <th>Data nascita</th>
+                          <th>Comune Residenza</th>
+                          <th>Indirizzo Residenza</th>
+                          <th>Telefono</th>
+                          <th>Email</th>
+                          <th>Data iscrizione</th>
+                          <th></th>
+                      </tr>
+                  </thead>
+                  <tbody>
+                    <% users.forEach((usr,index) => { %>
+                    <tr>
+                        <th> <%= usr.nome %></th>
+                        <th> <%= usr.cognome %></th>
+                        <th> <%= usr.luogo_nascita %></th>
+                        <th> <%= new Intl.DateTimeFormat('it-IT', { year: 'numeric', month: 'long', day: '2-digit'}).format( usr.data_nascita) %></th>
+                        <th> <%= usr.comune_residenza %></th>
+                        <th> <%= usr.indirizzo_residenza %></th>
+                        <th> <%= usr.telefono %></th>
+                        <th> <%= usr.email %></th>
+                        <th> <%= new Intl.DateTimeFormat('it-IT', { year: 'numeric', month: 'long', day: '2-digit', hour: '2-digit', minute: '2-digit',}).format( usr.data_iscrizione) %></th>
+                        <th> <a class="btn btn-primary btn-sm" href="/<%-usr.id%>"> Visualizza </a> </th>
+                    </tr>
+                   <% }) %>
+                 </tbody>
+                  <tfoot>
+                        <tr>
+                            <th>Nome</th>
+                            <th>Cognome</th>
+                        </tr>
+                  </tfoot>
+              </table>
+              </div>
+            </div>
+          </div>
+        </div>
+    </div>
+  </main>
+  <!--   Core JS Files   -->
+  <script src="js/core/popper.min.js"></script>
+  <script src="js/core/bootstrap.min.js"></script>
+  <script src="js/plugins/perfect-scrollbar.min.js"></script>
+  <script src="js/plugins/smooth-scrollbar.min.js"></script>
+  <script src="js/plugins/chartjs.min.js"></script>
+  <script src="datatable/datatables.min.js"></script>
+  <script>
+  const table =  $('#tabella').DataTable( {
+    info: true,
+    ordering: true,
+    paging: true,
+    scrollX: true,
+    dom: 'Bfrtip',
+        buttons: [
+        {
+            extend: 'pdfHtml5',
+            text: 'PDF',
+            download:'open',
+                    columns: ':visible',
+                    orientation: 'landscape',
+                    pageSize: 'LEGAL',
+                    title: `Associati ${Intl.DateTimeFormat('it-IT', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit',  hour12: false }).format(new Date)}`,
+        },
+        {
+            extend: 'excelHtml5',
+            autoFilter: true,
+            text: 'Excel',
+            exportOptions: {
+                    columns: ':visible'
+                },
+        },
+            'colvis'
+        ],
+    language: {
+    infoFiltered: "(filtrati da _MAX_ elementi totali)",
+    infoThousands : ".",
+    loadingRecords: "Caricamento...",
+    processing: "Elaborazione...",
+    search: "Cerca:",
+    paginate: {
+        first: "Inizio",
+        previous: "Prec",
+        next: "Suc",
+        last: "Fine"
+    },
+    aria: {
+        sortAscending: ": attiva per ordinare la colonna in ordine crescente",
+        sortDescending: ": attiva per ordinare la colonna in ordine decrescente"
+    },
+    autoFill: {
+        cancel: "Annulla",
+        fill: "Riempi tutte le celle con <i>%d<\/i>",
+        fillHorizontal: "Riempi celle orizzontalmente",
+        fillVertical: "Riempi celle verticalmente"
+    },
+    buttons: {
+        collection: "Collezione <span class=\"ui-button-icon-primary ui-icon ui-icon-triangle-1-s\"><\/span>",
+        colvis: "Visibilità Colonna",
+        colvisRestore: "Ripristina visibilità",
+        copy: "Copia",
+        copyKeys: "Premi ctrl o u2318 + C per copiare i dati della tabella nella tua clipboard di sistema.<br \/><br \/>Per annullare, clicca questo messaggio o premi ESC.",
+        copySuccess: {
+            1: "Copiata 1 riga nella clipboard",
+            _: "Copiate %d righe nella clipboard"
+        },
+        copyTitle: "Copia nella Clipboard",
+        csv: "CSV",
+        excel: "Excel",
+        pageLength: {
+            "-1": "Mostra tutte le righe",
+            _: "Mostra %d righe"
+        },
+        pdf: "PDF",
+        print: "Stampa",
+        createState: "Crea stato",
+        removeAllStates: "Rimuovi tutti gli stati",
+        removeState: "Rimuovi",
+        renameState: "Rinomina",
+        savedStates: "Salva stato",
+        stateRestore: "Ripristina stato",
+        updateState: "Aggiorna"
+    },
+    emptyTable: "Nessun dato disponibile nella tabella",
+    info: "Risultati da _START_ a _END_ di _TOTAL_ elementi",
+    infoEmpty: "Risultati da 0 a 0 di 0 elementi",
+    lengthMenu: "Mostra _MENU_ elementi",
+    searchBuilder: {
+        add: "Aggiungi Condizione",
+        button: {
+            0: "Generatore di Ricerca",
+            _: "Generatori di Ricerca (%d)"
+        },
+        clearAll: "Pulisci Tutto",
+        condition: "Condizione",
+        conditions: {
+            date: {
+                after: "Dopo",
+                before: "Prima",
+                between: "Tra",
+                empty: "Vuoto",
+                equals: "Uguale A",
+                not: "Non",
+                notBetween: "Non Tra",
+                notEmpty: "Non Vuoto"
+            },
+            number: {
+                between: "Tra",
+                empty: "Vuoto",
+                equals: "Uguale A",
+                gt: "Maggiore Di",
+                gte: "Maggiore O Uguale A",
+                lt: "Minore Di",
+                lte: "Minore O Uguale A",
+                not: "Non",
+                notBetween: "Non Tra",
+                notEmpty: "Non Vuoto"
+            },
+            string: {
+                contains: "Contiene",
+                empty: "Vuoto",
+                endsWith: "Finisce Con",
+                equals: "Uguale A",
+                not: "Non",
+                notEmpty: "Non Vuoto",
+                startsWith: "Inizia Con",
+                notContains: "Non Contiene",
+                notStartsWith: "Non Inizia Con",
+                notEndsWith: "Non Finisce Con"
+            },
+            array: {
+                equals: "Uguale A",
+                empty: "Vuoto",
+                contains: "Contiene",
+                not: "Non",
+                notEmpty: "Non Vuoto",
+                without: "Senza"
+            }
+        },
+        data: "Dati",
+        deleteTitle: "Elimina regola filtro",
+        leftTitle: "Criterio di Riduzione Rientro",
+        logicAnd: "E",
+        logicOr: "O",
+        rightTitle: "Criterio di Aumento Rientro",
+        title: {
+            0: "Generatore di Ricerca",
+            _: "Generatori di Ricerca (%d)"
+        },
+        value: "Valore"
+    },
+    searchPanes: {
+        clearMessage: "Pulisci Tutto",
+        collapse: {
+           0: "Pannello di Ricerca",
+            _: "Pannelli di Ricerca (%d)"
+        },
+        count: "{total}",
+        countFiltered: "{shown} ({total})",
+        emptyPanes: "Nessun Pannello di Ricerca",
+        loadMessage: "Caricamento Pannello di Ricerca",
+        title: "Filtri Attivi - %d",
+        showMessage: "Mostra tutto",
+        collapseMessage: "Espandi tutto"
+    },
+    zeroRecords: "Nessun elemento corrispondente trovato",
+},
+    lengthMenu: [
+        [10],
+        [10]
+    ],
+    "initComplete": function () {
+        this.api()
+            .columns()
+            .every(function () {
+                let column = this;
+                let title = column.footer().textContent;
+ 
+                // Create input element
+                let input = document.createElement('input');
+                input.placeholder = title;
+                column.footer().replaceChildren(input);
+ 
+                // Event listener for user input
+                input.addEventListener('keyup', () => {
+                    if (column.search() !== this.value) {
+                        column.search(input.value).draw();
+                    }
+                });
+            });
+    }
+} );
+
+// Formatting function for row details - modify as you need
+function format(d) {
+    // `d` is the original data object for the row
+    return (
+        '<dl>' +
+        '<dt>Full name:</dt>' +
+        '<dd>' +
+        d.nome +
+        '</dd>' +
+        '<dt>Extension number:</dt>' +
+        '<dd>' +
+        d.extn +
+        '</dd>' +
+        '<dt>Extra info:</dt>' +
+        '<dd>And any further details here (images etc)...</dd>' +
+        '</dl>'
+    );
+}
+
+// Add event listener for opening and closing details
+table.on('click', 'td.dt-control', function (e) {
+    let tr = e.target.closest('tr');
+    let row = table.row(tr);
+ 
+    if (row.child.isShown()) {
+        // This row is already open - close it
+        row.child.hide();
+    }
+    else {
+        // Open this row
+        row.child(format(row.data())).show();
+    }
+});
+
+document.querySelectorAll('a.toggle-vis').forEach((el) => {
+    el.addEventListener('click', (e)=> {
+        e.preventDefault();
+        console.log(e);
+        let columnIdx = e.target.getAttribute('data-column');
+        let column = table.column(columnIdx);
+        // Toggle the visibility
+        column.visible(!column.visible());
+    });
+});
+  </script>
+  <script>
+    var win = navigator.platform.indexOf('Win') > -1;
+    if (win && document.querySelector('#sidenav-scrollbar')) {
+      var options = {
+        damping: '0.5'
+      }
+      Scrollbar.init(document.querySelector('#sidenav-scrollbar'), options);
+    }
+  </script>
+
+  <!-- Control Center for Material Dashboard: parallax effects, scripts for the example pages etc -->
+  <script src="js/material-dashboard.min.js?v=3.1.0"></script>
+</body>
+
+</html>
